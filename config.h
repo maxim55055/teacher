@@ -4,12 +4,10 @@
 #include "components\requester\requester.h"
 #include <QSslConfiguration>
 
-extern Requester* req;
-
-class config
+class config : public QObject
 {
 private:
-    QString host = QString("172.18.0.1");
+    QString host = QString("192.168.56.1");
     int port = 8080;
     QSslConfiguration *ssl = nullptr;
 public:

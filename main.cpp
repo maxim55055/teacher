@@ -11,14 +11,14 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QSettings settings;
+    QSettings settings("NagaevM", "headmanApp");
 
     config conf;
 
     MainWindow w;
     login l;
 
-    if (settings.contains(QString("auth_token"))) {
+    if (settings.contains(QString("auth_token")) && settings.contains(QString("name"))) {
         w.show();
     } else {
         l.show();

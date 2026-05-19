@@ -6,6 +6,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 #include "components/requester/requester.h"
+#include "mainwindow.h"
 #include "config.h"
 
 #include <QDebug>
@@ -26,15 +27,26 @@ login::~login()
 }
 
 void login::loginButtonPress() {
-    QSettings* settings = new QSettings();;
     QJsonObject json;
     json["email"] = ui->emailInput->text();
     json["password"] = ui->passwordInput->text();
-    req->sendRequest(QString("student/login"),
-                     [=] (const QJsonObject &data) {
-                        settings->setValue("auth_token", data["token"]);
-                        settings->setValue("name", data["name"]);
+    Requester* r = new Requester(this);
+    r->initRequester("10.0.2.2", 8081, nullptr);
+    r->sendRequest(QString("employee/login"),
+    [this, r] (const QJsonObject &data) {
+        QSettings settings("NagaevM", "headmanApp");
+        settings.setValue("auth_token", data["token"].toString());
+        settings.setValue("name", data["name"].toString());
+        MainWindow* w = new MainWindow();
+        this->hide();
+        w->show();
+        r->deleteLater();
     },
-                    [=] (const QJsonObject &data) { ui->token->setText(data["error"].toString()); },
-                    Requester::Type::POST, json.toVariantMap());
+        [this, r] (const QJsonObject &data) {
+        ui->token->setText(data["error"].toString());
+        r->deleteLater();
+    },
+    Requester::Type::POST, json.toVariantMap()
+    );
+
 }
